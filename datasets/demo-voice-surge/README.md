@@ -6,4 +6,4 @@ Synthetic 15-minute inbound voice demand for a single skill.
 - **Use:** `mvn -pl reeforce-cli -am package` then run the CLI `gap` command against `demand.csv`.
 - **Columns:** `start_iso`, `end_iso`, `offered_volume`, `aht_seconds` (ISO-8601 instants, UTC).
 
-This fixture is intentionally small so contributors can extend it into the lunch-break service-level cliff benchmark (see open issues).
+For the clustered-lunch service-level cliff benchmark, see [`../lunch-sl-cliff/`](../lunch-sl-cliff/).
