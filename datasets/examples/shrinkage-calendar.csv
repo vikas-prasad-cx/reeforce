@@ -1,0 +1,4 @@
+start_iso,end_iso,shrinkage_fraction,headcount_offline,reason,skill,site,org_unit
+2026-07-22T14:00:00Z,2026-07-22T15:00:00Z,0.10,,team_meeting,voice,site-a,ops
+2026-07-22T16:00:00Z,2026-07-22T16:30:00Z,,2,coaching,,,
+2026-07-22T09:00:00Z,2026-07-22T09:30:00Z,0.05,,all_hands,,,east

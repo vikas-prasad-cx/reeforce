@@ -39,10 +39,10 @@ See [docs/thesis.md](docs/thesis.md) and [docs/glossary.md](docs/glossary.md).
 
 | Module | Role |
 |--------|------|
-| `reeforce-model` | Demand series, schedules, gap board, delta types, CSV loaders |
-| `reeforce-capacity` | Staffing requirement stubs (Erlang-A target) |
-| `reeforce-coverage` | Gap board from demand + schedules |
-| `reeforce-delta` | Mid-shift delta proposals (meal move stub) |
+| `reeforce-model` | Demand series, schedules, gap board, delta types, CSV loaders (demand/roster/shrinkage) |
+| `reeforce-capacity` | Erlang-C / Erlang-A required staffing ([docs/erlang-a.md](docs/erlang-a.md)) |
+| `reeforce-coverage` | Gap board from demand + schedules (+ optional shrinkage) |
+| `reeforce-delta` | Mid-shift deltas (meal move within contractual window) |
 | `reeforce-cli` | `gap` command for demo datasets |
 
 ## Architecture
@@ -79,6 +79,17 @@ mvn -pl reeforce-cli exec:java \
   -Dexec.mainClass=ai.reeforce.cli.ReeforceCli \
   -Dexec.args="gap datasets/demo-voice-surge/demand.csv"
 ```
+
+### Lunch SL cliff demo
+
+```bash
+mvn -pl reeforce-cli exec:java \
+  -Dexec.mainClass=ai.reeforce.cli.ReeforceCli \
+  -Dexec.args="gap datasets/lunch-sl-cliff/demand.csv --roster datasets/lunch-sl-cliff/roster.csv --meal-windows datasets/lunch-sl-cliff/meal-windows.csv"
+```
+
+Dataset schemas: [datasets/README.md](datasets/README.md). Staffing notes: [docs/erlang-a.md](docs/erlang-a.md).
+
 ## How to contribute
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md). Good first issues are labeled `good first issue` and `help wanted`.
