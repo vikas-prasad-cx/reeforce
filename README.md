@@ -118,7 +118,8 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md). Good first issues (open for contributor
 - [#2 Model chat concurrency for required staff](https://github.com/vikas-prasad-cx/reeforce/issues/2)
 - [#4 Adherence-by-TOD estimator stub](https://github.com/vikas-prasad-cx/reeforce/issues/4)
 - [#7 Adapter stub: statsforecast → DemandSeries](https://github.com/vikas-prasad-cx/reeforce/issues/7)
-- [#8 Docs: RTA playbook for reading the gap board](https://github.com/vikas-prasad-cx/reeforce/issues/8) — stub landed; expand welcome
+
+Operator playbook: [docs/rta-gap-board-playbook.md](docs/rta-gap-board-playbook.md). Changelog: [CHANGELOG.md](CHANGELOG.md).
 
 Also browse labels [`good first issue`](https://github.com/vikas-prasad-cx/reeforce/labels/good%20first%20issue) and [`help wanted`](https://github.com/vikas-prasad-cx/reeforce/labels/help%20wanted).
 

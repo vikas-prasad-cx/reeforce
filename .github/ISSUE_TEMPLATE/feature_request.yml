@@ -1,0 +1,44 @@
+name: Feature request
+description: Propose a delta type, adapter, staffing model, or docs improvement
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Reeforce is an **intraday control plane**, not a full WFM suite.
+        Check [non-goals](https://github.com/vikas-prasad-cx/reeforce#non-goals-mvp) before proposing.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What RTA / WFM pain does this address during the hour?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Desired behavior, inputs/outputs, and where it fits (model / capacity / coverage / delta / CLI / docs).
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Checklist that would make this shippable (tests, docs, fixtures).
+      placeholder: |
+        - [ ] Unit test with fixture
+        - [ ] Glossary / playbook note if operator-facing
+    validations:
+      required: false
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Fits MVP scope?
+      options:
+        - "Yes — small delta / adapter / estimator"
+        - "Maybe — discuss in issue first"
+        - "No — documenting as out of scope"
+    validations:
+      required: true

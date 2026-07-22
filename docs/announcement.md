@@ -16,7 +16,7 @@ Day-ahead tools (Timefold, OR-Tools) and forecast stacks (Nixtla) are strong. Th
 
 Java 21 · Apache-2.0 · `mvn test` green
 
-Try the lunch cliff demo and open good-first issues if you want to help (chat concurrency, adherence-by-TOD, statsforecast adapter, RTA playbook).
+Try the lunch cliff demo and open good-first issues if you want to help (chat concurrency, adherence-by-TOD, statsforecast adapter).
 
 https://github.com/vikas-prasad-cx/reeforce
 
@@ -36,4 +36,4 @@ mvn -pl reeforce-cli exec:java \
   -Dexec.args="gap datasets/lunch-sl-cliff/demand.csv --roster datasets/lunch-sl-cliff/roster.csv --meal-windows datasets/lunch-sl-cliff/meal-windows.csv"
 ```
 
-Good first issues: #2 #4 #7 #8 → https://github.com/vikas-prasad-cx/reeforce
+Good first issues: #2 #4 #7 → https://github.com/vikas-prasad-cx/reeforce
