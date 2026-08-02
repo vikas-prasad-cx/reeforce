@@ -1,10 +1,11 @@
 package ai.reeforce.cli;
 
 import ai.reeforce.coverage.GapBoardBuilder;
-import ai.reeforce.delta.SimpleDeltaEngine;
+import ai.reeforce.delta.DomainDeltaEngine;
 import ai.reeforce.model.AgentSchedule;
 import ai.reeforce.model.DemandCsvLoader;
 import ai.reeforce.model.DemandSeries;
+import ai.reeforce.model.DomainProfile;
 import ai.reeforce.model.GapBoard;
 import ai.reeforce.model.RosterCsvLoader;
 import ai.reeforce.model.ScheduleDelta;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Minimal CLI: reeforce gap &lt;demand.csv&gt; [--roster ...] [--meal-windows ...] [--shrinkage ...]
+ * Minimal CLI: reeforce gap &lt;demand.csv&gt; [--domain ...] [--roster ...] ...
  */
 public final class ReeforceCli {
 
@@ -41,33 +42,39 @@ public final class ReeforceCli {
     }
 
     static void runGap(GapArgs gapArgs) throws IOException {
+        DomainProfile domain = gapArgs.domain;
         String csv = Files.readString(gapArgs.demandCsv);
-        DemandSeries demand = DemandCsvLoader.load("voice", "inbound", csv);
+        DemandSeries demand = DemandCsvLoader.load(domain.defaultSkill(), domain.defaultChannel(), csv);
 
         List<AgentSchedule> schedules;
         if (gapArgs.rosterCsv != null) {
             String roster = Files.readString(gapArgs.rosterCsv);
             String windows = gapArgs.mealWindowsCsv == null ? null : Files.readString(gapArgs.mealWindowsCsv);
             schedules = RosterCsvLoader.load(roster, windows);
-        } else {
+        } else if (domain == DomainProfile.CONTACT_CENTER) {
             schedules = demoSchedules(demand);
+        } else {
+            System.err.println("--roster is required for domain " + domain.cliName());
+            System.exit(2);
+            return;
         }
 
         ShrinkageCalendar shrinkage = gapArgs.shrinkageCsv == null
                 ? new ShrinkageCalendar(List.of())
                 : ShrinkageCsvLoader.load(Files.readString(gapArgs.shrinkageCsv));
 
-        GapBoard board = new GapBoardBuilder(0.80, 20, shrinkage).build(demand, schedules);
-        ScheduleDelta delta = new SimpleDeltaEngine().propose(board, schedules);
+        GapBoard board = new GapBoardBuilder(domain, 0.80, 20, shrinkage).build(demand, schedules);
+        ScheduleDelta delta = new DomainDeltaEngine(domain).propose(board, schedules);
 
         double peakGap = board.rows().stream().mapToDouble(GapBoard.GapRow::gap).max().orElse(0);
         long under = board.rows().stream().filter(GapBoard.GapRow::understaffed).count();
 
-        System.out.println("Reeforce gap board — " + demand.skill() + "/" + demand.channel());
+        System.out.println("Reeforce gap board — " + domain.cliName()
+                + " (" + demand.skill() + "/" + demand.channel() + ")");
         System.out.println("intervals=" + board.rows().size()
                 + " understaffed=" + under
                 + " peak_gap=" + String.format(Locale.ROOT, "%.1f", peakGap)
-                + " roster=" + schedules.size() + " agents"
+                + " resources=" + schedules.size()
                 + (gapArgs.shrinkageCsv != null ? " shrinkage=on" : ""));
         System.out.printf(Locale.ROOT, "%-22s %10s %10s %10s %s%n",
                 "interval_start", "required", "available", "gap", "flag");
@@ -77,8 +84,8 @@ public final class ReeforceCli {
                     Locale.ROOT,
                     "%-22s %10.1f %10.1f %10.1f %s%n",
                     row.interval().start(),
-                    row.requiredStaff(),
-                    row.availableStaff(),
+                    row.required(),
+                    row.available(),
                     row.gap(),
                     flag
             );
@@ -86,7 +93,7 @@ public final class ReeforceCli {
         System.out.println();
         System.out.println("Proposed deltas: " + delta.actions().size());
         for (ScheduleDelta.DeltaAction action : delta.actions()) {
-            System.out.println(" - " + action.type() + " agent=" + action.agentId()
+            System.out.println(" - " + action.type() + " resource=" + action.agentId()
                     + " from=" + action.from().start() + "→" + action.from().end()
                     + " to=" + action.to().start() + "→" + action.to().end()
                     + " (" + action.rationale() + ")");
@@ -94,7 +101,7 @@ public final class ReeforceCli {
     }
 
     /**
-     * Synthetic roster for the demo: 8 agents available, except A3 on meal during the surge hour.
+     * Synthetic roster for the contact-center demo: 8 agents available, except A3 on meal during the surge hour.
      */
     static List<AgentSchedule> demoSchedules(DemandSeries demand) {
         if (demand.points().isEmpty()) {
@@ -140,8 +147,10 @@ public final class ReeforceCli {
                   reeforce gap <demand.csv> [options]
                 
                 Options:
-                  --roster <roster.csv>              Published agent blocks
-                  --meal-windows <windows.csv>       Contractual meal start windows
+                  --domain <name>                    contact-center (default) | school-conference
+                                                     | class-section | traffic-corridor
+                  --roster <roster.csv>              Published resource blocks
+                  --meal-windows <windows.csv>       Contractual meal/slot start windows
                   --shrinkage <shrinkage.csv>        Shrinkage calendar
                 
                 Commands:
@@ -152,21 +161,33 @@ public final class ReeforceCli {
                   reeforce gap datasets/lunch-sl-cliff/demand.csv \\
                     --roster datasets/lunch-sl-cliff/roster.csv \\
                     --meal-windows datasets/lunch-sl-cliff/meal-windows.csv
+                  reeforce gap datasets/school-conference-cliff/demand.csv \\
+                    --domain school-conference \\
+                    --roster datasets/school-conference-cliff/roster.csv \\
+                    --meal-windows datasets/school-conference-cliff/slot-windows.csv
                 """);
     }
 
-    record GapArgs(Path demandCsv, Path rosterCsv, Path mealWindowsCsv, Path shrinkageCsv) {
+    record GapArgs(
+            Path demandCsv,
+            DomainProfile domain,
+            Path rosterCsv,
+            Path mealWindowsCsv,
+            Path shrinkageCsv
+    ) {
         static GapArgs parse(String[] args) {
             if (args.length < 2) {
-                System.err.println("Usage: reeforce gap <demand.csv> [--roster ...] [--meal-windows ...] [--shrinkage ...]");
+                System.err.println("Usage: reeforce gap <demand.csv> [--domain ...] [--roster ...] ...");
                 System.exit(2);
             }
             Path demand = Path.of(args[1]);
+            DomainProfile domain = DomainProfile.CONTACT_CENTER;
             Path roster = null;
             Path meals = null;
             Path shrinkage = null;
             for (int i = 2; i < args.length; i++) {
                 switch (args[i]) {
+                    case "--domain" -> domain = DomainProfile.fromCli(requireValue(args, ++i, "--domain"));
                     case "--roster" -> roster = Path.of(requireValue(args, ++i, "--roster"));
                     case "--meal-windows" -> meals = Path.of(requireValue(args, ++i, "--meal-windows"));
                     case "--shrinkage" -> shrinkage = Path.of(requireValue(args, ++i, "--shrinkage"));
@@ -176,7 +197,7 @@ public final class ReeforceCli {
                     }
                 }
             }
-            return new GapArgs(demand, roster, meals, shrinkage);
+            return new GapArgs(demand, domain, roster, meals, shrinkage);
         }
 
         private static String requireValue(String[] args, int index, String flag) {

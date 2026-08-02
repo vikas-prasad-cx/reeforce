@@ -8,15 +8,22 @@ start_iso,end_iso,offered_volume,aht_seconds
 
 ISO-8601 instants (UTC recommended). Used by `DemandCsvLoader`.
 
+For non-Erlang domains (`school-conference`, `class-section`, `traffic-corridor`),
+`offered_volume` is required capacity directly; `aht_seconds` is kept for schema
+compatibility (use interval length, e.g. `900`).
+
 ## Roster CSV
 
 ```text
-agent_id,start_iso,end_iso,state
+agent_id,start_iso,end_iso,state[,capacity]
 ```
 
 `state` ∈ `AVAILABLE`, `MEAL`, `BREAK`, `TRAINING`, `OFFLINE`.
 
-Optional meal windows:
+Optional `capacity` (default `1.0`) scales AVAILABLE coverage — seats in a
+section or vehicles/interval of corridor throughput.
+
+Optional meal/slot windows:
 
 ```text
 agent_id,meal_earliest_start,meal_latest_start
@@ -45,8 +52,11 @@ Loaded by `ShrinkageCsvLoader` and applied in `GapBoardBuilder` as
 
 ## Fixtures
 
-| Path | Purpose |
-|------|---------|
-| `demo-voice-surge/` | Small surge + single meal for CLI smoke |
-| `lunch-sl-cliff/` | Clustered lunches → SL cliff benchmark |
-| `examples/shrinkage-calendar.csv` | Shrinkage schema example |
+| Path | Domain | Purpose |
+|------|--------|---------|
+| `demo-voice-surge/` | contact-center | Small surge + single meal for CLI smoke |
+| `lunch-sl-cliff/` | contact-center | Clustered lunches → SL cliff benchmark |
+| `school-conference-cliff/` | school-conference | Parent-teacher slot cliff + `MOVE_SLOT` |
+| `class-section-overfill/` | class-section | Registration overfill + `OPEN_SECTION` |
+| `traffic-corridor-peak/` | traffic-corridor | Morning peak + open spare lane |
+| `examples/shrinkage-calendar.csv` | — | Shrinkage schema example |

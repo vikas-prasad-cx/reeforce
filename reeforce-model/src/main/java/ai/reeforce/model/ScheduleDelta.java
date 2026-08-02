@@ -18,7 +18,15 @@ public record ScheduleDelta(List<DeltaAction> actions) {
         MOVE_BREAK,
         EXTEND_SHIFT,
         VOLUNTEER_OT,
-        CANCEL_ACTIVITY
+        CANCEL_ACTIVITY,
+        /** School conference: slide a booked/prep slot inside the teacher window. */
+        MOVE_SLOT,
+        /** School conference: suggest an alternate room for a stacked slot. */
+        REASSIGN_ROOM,
+        /** Class section / traffic: bring offline overflow capacity online on the peak. */
+        OPEN_SECTION,
+        /** Traffic: shift a demand pulse off the peak corridor interval. */
+        RETIME_DEMAND
     }
 
     public record DeltaAction(

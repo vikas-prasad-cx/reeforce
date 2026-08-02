@@ -10,7 +10,7 @@
   </parent>
   <artifactId>reeforce-capacity</artifactId>
   <name>Reeforce Capacity</name>
-  <description>Staffing / Erlang capacity models</description>
+  <description>Staffing / Erlang and direct capacity models</description>
   <dependencies>
     <dependency>
       <groupId>ai.reeforce</groupId>

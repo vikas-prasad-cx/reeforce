@@ -2,6 +2,23 @@
 
 All notable changes to Reeforce are documented here.
 
+## [Unreleased] — 0.2.0-SNAPSHOT
+
+### Added
+
+- Multi-domain control plane via `--domain`:
+  `contact-center` · `school-conference` · `class-section` · `traffic-corridor`
+- Direct capacity model (volume → required units) for non-Erlang domains
+- Resource `capacity` column on roster CSV (seats / corridor throughput)
+- Domain deltas: `MOVE_SLOT`, `OPEN_SECTION`, `RETIME_DEMAND` (+ `REASSIGN_ROOM` enum)
+- Demo fixtures: `school-conference-cliff`, `class-section-overfill`, `traffic-corridor-peak`
+- Use-case docs under `docs/use-cases/`
+
+### Changed
+
+- README positioning: intraday capacity control plane (CC + schools + corridors)
+- Thesis / glossary generalized beyond contact-center-only wording
+
 ## [0.1.0] — 2026-07-22
 
 First public MVP of the intraday WFM control plane.

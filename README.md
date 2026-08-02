@@ -2,24 +2,30 @@
 
 **Plan the day. Replan the hour.**
 
-Open-source **intraday WFM control plane** for contact centers: turn live demand and real adherence into feasible mid-shift schedule deltas.
+Open-source **intraday capacity control plane**: turn live demand and published
+resources into a gap board and feasible mid-horizon schedule deltas — for
+contact centers, school conferences, class sections, and corridor ops.
 
 [![CI](https://github.com/vikas-prasad-cx/reeforce/actions/workflows/ci.yml/badge.svg)](https://github.com/vikas-prasad-cx/reeforce/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 ## Why Reeforce
 
-Day-ahead optimizers and forecast labs solve yesterday’s plan and tomorrow’s volume. RTAs still replan the **next hour** by instinct when lunches stack, adherence slips, or shrinkage lands unevenly.
+Day-ahead solvers and forecast labs solve yesterday’s plan and tomorrow’s volume.
+Operators still replan the **next hour** by instinct when lunches stack, conference
+slots cliff, sections overfill, or corridors overload.
 
-Reeforce is the missing control loop: sense the gap → propose small, contractual schedule deltas → learn what closed the cliff.
+Reeforce is the missing control loop: sense the gap → propose small, contractual
+deltas → learn what closed the cliff.
 
 It **complements** (does not replace):
 
 | Project | Role vs Reeforce |
 |---------|------------------|
-| [Timefold](https://github.com/TimefoldAI/timefold-solver) | Day-ahead / constraint solve; Reeforce consumes published schedules and proposes intraday deltas |
-| [Nixtla / statsforecast](https://github.com/Nixtla/statsforecast) | Demand forecasting; Reeforce consumes forecast series |
-| [pyworkforce](https://github.com/CarlosHerreraC/pyworkforce) | Erlang / staffing utilities; Reeforce owns the live control loop |
+| [Timefold](https://github.com/TimefoldAI/timefold-solver) / [UniTime](https://github.com/UniTime/unitime) / FET | Day-ahead / constraint solve; Reeforce consumes published schedules |
+| [Nixtla / statsforecast](https://github.com/Nixtla/statsforecast) / [skforecast](https://github.com/skforecast/skforecast) | Demand forecasting; Reeforce consumes forecast series |
+| [pyworkforce](https://github.com/CarlosHerreraC/pyworkforce) | Erlang utilities; Reeforce owns the live control loop |
+| AequilibraE / dyntapy | Full traffic assignment; Reeforce owns interval capacity gaps |
 
 ## Quick start
 
@@ -31,7 +37,7 @@ cd reeforce
 mvn test
 ```
 
-Run the lunch SL-cliff demo (copy-paste):
+### Contact center — lunch SL cliff
 
 ```bash
 mvn -q install -DskipTests
@@ -40,51 +46,44 @@ mvn -pl reeforce-cli exec:java \
   -Dexec.args="gap datasets/lunch-sl-cliff/demand.csv --roster datasets/lunch-sl-cliff/roster.csv --meal-windows datasets/lunch-sl-cliff/meal-windows.csv"
 ```
 
-Smoke with the smaller surge fixture:
+### School conference — slot cliff
 
 ```bash
 mvn -pl reeforce-cli exec:java \
   -Dexec.mainClass=ai.reeforce.cli.ReeforceCli \
-  -Dexec.args="gap datasets/demo-voice-surge/demand.csv"
+  -Dexec.args="gap datasets/school-conference-cliff/demand.csv --domain school-conference --roster datasets/school-conference-cliff/roster.csv --meal-windows datasets/school-conference-cliff/slot-windows.csv"
 ```
 
-### Sample gap-board output (lunch-sl-cliff)
+### Class section — registration overfill
 
-Six meals stacked on the 12:00–12:30 window while volume peaks — the board flags the cliff and proposes a meal move inside the contractual window:
+```bash
+mvn -pl reeforce-cli exec:java \
+  -Dexec.mainClass=ai.reeforce.cli.ReeforceCli \
+  -Dexec.args="gap datasets/class-section-overfill/demand.csv --domain class-section --roster datasets/class-section-overfill/roster.csv"
+```
 
-```text
-Reeforce gap board — voice/inbound
-intervals=12 understaffed=2 peak_gap=7.0 roster=30 agents
-interval_start           required  available        gap flag
-2026-07-22T11:00:00Z         13.0       30.0      -17.0 OVER
-2026-07-22T11:15:00Z         13.0       30.0      -17.0 OVER
-2026-07-22T11:30:00Z         14.0       30.0      -16.0 OVER
-2026-07-22T11:45:00Z         15.0       30.0      -15.0 OVER
-2026-07-22T12:00:00Z         29.0       24.0        5.0 UNDER
-2026-07-22T12:15:00Z         31.0       24.0        7.0 UNDER
-2026-07-22T12:30:00Z         28.0       30.0       -2.0 OVER
-2026-07-22T12:45:00Z         23.0       30.0       -7.0 OVER
-2026-07-22T13:00:00Z         17.0       30.0      -13.0 OVER
-2026-07-22T13:15:00Z         16.0       30.0      -14.0 OVER
-2026-07-22T13:30:00Z         15.0       30.0      -15.0 OVER
-2026-07-22T13:45:00Z         14.0       30.0      -16.0 OVER
+### Traffic corridor — morning peak
 
-Proposed deltas: 1
- - MOVE_MEAL agent=A1 from=2026-07-22T12:00:00Z→2026-07-22T12:30:00Z to=2026-07-22T11:30:00Z→2026-07-22T12:00:00Z (Peak understaffed gap at 2026-07-22T12:15:00Z (gap=7.0); move meal within window to free capacity)
+```bash
+mvn -pl reeforce-cli exec:java \
+  -Dexec.mainClass=ai.reeforce.cli.ReeforceCli \
+  -Dexec.args="gap datasets/traffic-corridor-peak/demand.csv --domain traffic-corridor --roster datasets/traffic-corridor-peak/roster.csv --meal-windows datasets/traffic-corridor-peak/slot-windows.csv"
 ```
 
 How to read `UNDER` / `OVER` / `peak_gap`: [docs/rta-gap-board-playbook.md](docs/rta-gap-board-playbook.md).
+
+Use cases: [school conference](docs/use-cases/school-conference.md) · [class section](docs/use-cases/class-section.md) · [traffic corridor](docs/use-cases/traffic-corridor.md).
 
 Dataset schemas: [datasets/README.md](datasets/README.md). Staffing notes: [docs/erlang-a.md](docs/erlang-a.md).
 
 ## Thesis (short)
 
-Intraday WFM is a closed-loop control problem, not a one-shot roster solve.
+Intraday capacity management is a closed-loop control problem, not a one-shot roster solve.
 
-1. **Sense** — demand now / next hour, adherence-by-TOD, shrinkage calendar.
-2. **Compare** — required vs available capacity → gap board.
-3. **Act** — constrained deltas (move meal within window, pull OT, cancel activity).
-4. **Learn** — which moves actually closed service-level cliffs.
+1. **Sense** — demand now / next hour, adherence, shrinkage, open capacity.
+2. **Compare** — required vs available → gap board.
+3. **Act** — constrained deltas (move meal/slot, open overflow, retime pulse).
+4. **Learn** — which moves actually closed the cliff.
 
 See [docs/thesis.md](docs/thesis.md) and [docs/glossary.md](docs/glossary.md).
 
@@ -93,22 +92,25 @@ See [docs/thesis.md](docs/thesis.md) and [docs/glossary.md](docs/glossary.md).
 ```text
 DemandSeries ──► Capacity (required N) ──┐
                                          ├──► GapBoard ──► DeltaEngine ──► ScheduleDelta
-AgentSchedule ─► Coverage (available N) ─┘
+ResourceSchedule ► Coverage (available) ─┘
 ```
+
+Domains via `--domain`: `contact-center` (Erlang) · `school-conference` · `class-section` · `traffic-corridor`.
 
 | Module | Role |
 |--------|------|
-| `reeforce-model` | Demand series, schedules, gap board, delta types, CSV loaders |
-| `reeforce-capacity` | Erlang-C / Erlang-A required staffing |
-| `reeforce-coverage` | Gap board from demand + schedules (+ optional shrinkage) |
-| `reeforce-delta` | Mid-shift deltas (meal move within contractual window) |
+| `reeforce-model` | Demand, schedules, gap board, domain profile, CSV loaders |
+| `reeforce-capacity` | Erlang + direct capacity models |
+| `reeforce-coverage` | Gap board from demand + resources |
+| `reeforce-delta` | Domain-aware mid-horizon deltas |
 | `reeforce-cli` | `gap` command for demo datasets |
 
 ## Non-goals (MVP)
 
-- Not a full enterprise WFM suite (timekeeping, payroll, HRIS).
-- Not a general MIP/CP day-ahead roster optimizer (use Timefold / OR-Tools / etc.).
-- Not a forecasting research lab (use Nixtla, skforecast, statsforecast, NeuralForecast).
+- Not a full enterprise WFM / SIS / PTC booking suite.
+- Not a general MIP/CP day-ahead timetable optimizer (use Timefold / UniTime / FET).
+- Not a forecasting research lab (use Nixtla, skforecast, NeuralForecast).
+- Not macroscopic traffic assignment (use AequilibraE / dyntapy).
 - Not a multi-tenant SaaS product in this repository.
 
 ## How to contribute

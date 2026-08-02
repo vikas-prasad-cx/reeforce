@@ -1,8 +1,9 @@
 package ai.reeforce.coverage;
 
-import ai.reeforce.capacity.ErlangStaffing;
+import ai.reeforce.capacity.DomainCapacity;
 import ai.reeforce.model.AgentSchedule;
 import ai.reeforce.model.DemandSeries;
+import ai.reeforce.model.DomainProfile;
 import ai.reeforce.model.GapBoard;
 import ai.reeforce.model.ShrinkageCalendar;
 import ai.reeforce.model.TimeInterval;
@@ -12,11 +13,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Builds a gap board by comparing required staff (from demand) to available agents,
- * optionally reduced by a shrinkage calendar.
+ * Builds a gap board by comparing required capacity (from demand + domain model)
+ * to available resource units, optionally reduced by a shrinkage calendar.
  */
 public final class GapBoardBuilder {
 
+    private final DomainProfile domain;
     private final double serviceLevel;
     private final double targetAnswerSeconds;
     private final ShrinkageCalendar shrinkage;
@@ -24,7 +26,8 @@ public final class GapBoardBuilder {
     private final Optional<String> siteFilter;
 
     public GapBoardBuilder(double serviceLevel, double targetAnswerSeconds) {
-        this(serviceLevel, targetAnswerSeconds, new ShrinkageCalendar(List.of()), Optional.empty(), Optional.empty());
+        this(DomainProfile.CONTACT_CENTER, serviceLevel, targetAnswerSeconds,
+                new ShrinkageCalendar(List.of()), Optional.empty(), Optional.empty());
     }
 
     public GapBoardBuilder(
@@ -32,7 +35,8 @@ public final class GapBoardBuilder {
             double targetAnswerSeconds,
             ShrinkageCalendar shrinkage
     ) {
-        this(serviceLevel, targetAnswerSeconds, shrinkage, Optional.empty(), Optional.empty());
+        this(DomainProfile.CONTACT_CENTER, serviceLevel, targetAnswerSeconds, shrinkage,
+                Optional.empty(), Optional.empty());
     }
 
     public GapBoardBuilder(
@@ -42,6 +46,33 @@ public final class GapBoardBuilder {
             Optional<String> skillFilter,
             Optional<String> siteFilter
     ) {
+        this(DomainProfile.CONTACT_CENTER, serviceLevel, targetAnswerSeconds, shrinkage,
+                skillFilter, siteFilter);
+    }
+
+    public GapBoardBuilder(DomainProfile domain, double serviceLevel, double targetAnswerSeconds) {
+        this(domain, serviceLevel, targetAnswerSeconds, new ShrinkageCalendar(List.of()),
+                Optional.empty(), Optional.empty());
+    }
+
+    public GapBoardBuilder(
+            DomainProfile domain,
+            double serviceLevel,
+            double targetAnswerSeconds,
+            ShrinkageCalendar shrinkage
+    ) {
+        this(domain, serviceLevel, targetAnswerSeconds, shrinkage, Optional.empty(), Optional.empty());
+    }
+
+    public GapBoardBuilder(
+            DomainProfile domain,
+            double serviceLevel,
+            double targetAnswerSeconds,
+            ShrinkageCalendar shrinkage,
+            Optional<String> skillFilter,
+            Optional<String> siteFilter
+    ) {
+        this.domain = domain == null ? DomainProfile.CONTACT_CENTER : domain;
         this.serviceLevel = serviceLevel;
         this.targetAnswerSeconds = targetAnswerSeconds;
         this.shrinkage = shrinkage == null ? new ShrinkageCalendar(List.of()) : shrinkage;
@@ -53,7 +84,8 @@ public final class GapBoardBuilder {
         List<GapBoard.GapRow> rows = new ArrayList<>();
         for (DemandSeries.DemandPoint point : demand.points()) {
             TimeInterval interval = point.interval();
-            double required = ErlangStaffing.requiredStaff(
+            double required = DomainCapacity.required(
+                    domain,
                     point.offeredVolume(),
                     point.ahtSeconds(),
                     interval.durationSeconds(),
@@ -73,7 +105,7 @@ public final class GapBoardBuilder {
         for (AgentSchedule schedule : schedules) {
             for (AgentSchedule.ScheduleBlock block : schedule.blocks()) {
                 if (block.state() == AgentSchedule.State.AVAILABLE && overlaps(block.interval(), interval)) {
-                    count += overlapFraction(block.interval(), interval);
+                    count += schedule.capacityUnits() * overlapFraction(block.interval(), interval);
                 }
             }
         }
