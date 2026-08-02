@@ -18,14 +18,10 @@ slots cliff, sections overfill, or corridors overload.
 Reeforce is the missing control loop: sense the gap → propose small, contractual
 deltas → learn what closed the cliff.
 
-It **complements** (does not replace):
-
-| Project | Role vs Reeforce |
-|---------|------------------|
-| [Timefold](https://github.com/TimefoldAI/timefold-solver) / [UniTime](https://github.com/UniTime/unitime) / FET | Day-ahead / constraint solve; Reeforce consumes published schedules |
-| [Nixtla / statsforecast](https://github.com/Nixtla/statsforecast) / [skforecast](https://github.com/skforecast/skforecast) | Demand forecasting; Reeforce consumes forecast series |
-| [pyworkforce](https://github.com/CarlosHerreraC/pyworkforce) | Erlang utilities; Reeforce owns the live control loop |
-| AequilibraE / dyntapy | Full traffic assignment; Reeforce owns interval capacity gaps |
+It complements day-ahead solvers ([Timefold](https://github.com/TimefoldAI/timefold-solver),
+[UniTime](https://github.com/UniTime/unitime)) and forecast stacks
+([Nixtla](https://github.com/Nixtla/statsforecast), [skforecast](https://github.com/skforecast/skforecast)) —
+Reeforce owns the hour-of gap → delta loop.
 
 ## Quick start
 
