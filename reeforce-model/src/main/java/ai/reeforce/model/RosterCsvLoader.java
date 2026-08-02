@@ -9,13 +9,16 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * CSV loader for published agent schedules.
+ * CSV loader for published resource schedules (agents, teachers, sections, corridors).
  *
  * <p>Block file header:
- * {@code agent_id,start_iso,end_iso,state}
+ * {@code agent_id,start_iso,end_iso,state[,capacity]}
  *
- * <p>Optional meal-window file header:
+ * <p>Optional meal/slot-window file header:
  * {@code agent_id,meal_earliest_start,meal_latest_start}
+ *
+ * <p>Optional {@code capacity} (default 1.0) scales AVAILABLE coverage — e.g. seats
+ * in a section or vehicles/interval of corridor throughput.
  */
 public final class RosterCsvLoader {
 
@@ -28,6 +31,7 @@ public final class RosterCsvLoader {
 
     public static List<AgentSchedule> load(String rosterCsv, String mealWindowsCsv) {
         Map<String, List<AgentSchedule.ScheduleBlock>> blocksByAgent = new LinkedHashMap<>();
+        Map<String, Double> capacityByAgent = new LinkedHashMap<>();
         String[] lines = rosterCsv.strip().split("\\R");
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i].trim();
@@ -37,7 +41,8 @@ public final class RosterCsvLoader {
             }
             String[] parts = line.split(",", -1);
             if (parts.length < 4) {
-                throw new IllegalArgumentException("Expected agent_id,start_iso,end_iso,state at line " + (i + 1));
+                throw new IllegalArgumentException(
+                        "Expected agent_id,start_iso,end_iso,state[,capacity] at line " + (i + 1));
             }
             String agentId = parts[0].trim();
             Instant start = Instant.parse(parts[1].trim());
@@ -46,6 +51,9 @@ public final class RosterCsvLoader {
             blocksByAgent
                     .computeIfAbsent(agentId, id -> new ArrayList<>())
                     .add(new AgentSchedule.ScheduleBlock(new TimeInterval(start, end), state));
+            if (parts.length >= 5 && !parts[4].trim().isEmpty()) {
+                capacityByAgent.put(agentId, Double.parseDouble(parts[4].trim()));
+            }
         }
 
         Map<String, AgentSchedule.MealWindow> windows = new LinkedHashMap<>();
@@ -77,7 +85,8 @@ public final class RosterCsvLoader {
             schedules.add(new AgentSchedule(
                     e.getKey(),
                     e.getValue(),
-                    windows.get(e.getKey())
+                    windows.get(e.getKey()),
+                    capacityByAgent.getOrDefault(e.getKey(), 1.0)
             ));
         }
         return schedules;

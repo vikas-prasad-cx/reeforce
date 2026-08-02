@@ -6,19 +6,35 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * One agent's planned states across the day (work, meal, break, offline).
+ * One resource's planned states across the day (agent, teacher, section, corridor).
+ *
+ * <p>{@code capacityUnits} scales AVAILABLE coverage (default 1.0). Sections and
+ * corridors use values &gt; 1 for seats / vehicles-per-interval of throughput.
  */
-public record AgentSchedule(String agentId, List<ScheduleBlock> blocks, MealWindow mealWindow) {
+public record AgentSchedule(
+        String agentId,
+        List<ScheduleBlock> blocks,
+        MealWindow mealWindow,
+        double capacityUnits
+) {
 
     public AgentSchedule {
         Objects.requireNonNull(agentId, "agentId");
         Objects.requireNonNull(blocks, "blocks");
         blocks = List.copyOf(blocks);
+        if (capacityUnits <= 0) {
+            throw new IllegalArgumentException("capacityUnits must be > 0");
+        }
     }
 
-    /** Convenience when no contractual meal window is modeled. */
+    /** Convenience when no contractual meal/slot window is modeled. */
     public AgentSchedule(String agentId, List<ScheduleBlock> blocks) {
-        this(agentId, blocks, null);
+        this(agentId, blocks, null, 1.0);
+    }
+
+    /** Convenience with meal/slot window and unit capacity. */
+    public AgentSchedule(String agentId, List<ScheduleBlock> blocks, MealWindow mealWindow) {
+        this(agentId, blocks, mealWindow, 1.0);
     }
 
     public Optional<MealWindow> mealWindowOptional() {

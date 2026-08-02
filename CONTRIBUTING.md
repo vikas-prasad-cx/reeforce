@@ -21,17 +21,17 @@ mvn test
 
 ## Project layout
 
-- `reeforce-model` — domain types
-- `reeforce-capacity` — staffing models
+- `reeforce-model` — domain types (`DomainProfile`, schedules, gap board)
+- `reeforce-capacity` — Erlang + direct capacity models
 - `reeforce-coverage` — gap board
-- `reeforce-delta` — schedule deltas
-- `reeforce-cli` — demo CLI
-- `datasets/` — fixtures
-- `docs/` — thesis & glossary
+- `reeforce-delta` — domain-aware schedule deltas
+- `reeforce-cli` — demo CLI (`--domain`)
+- `datasets/` — fixtures (contact center, school, class, traffic)
+- `docs/` — thesis, glossary, use cases
 
 ## Good first contributions
 
-Look for issues labeled `good first issue` or `help wanted`: Erlang test vectors, CSV schemas, adapter stubs, and docs are intentionally scoped for newcomers.
+Look for issues labeled `good first issue` or `help wanted`: Erlang test vectors, CSV schemas, forecast adapters, domain fixtures, and docs are intentionally scoped for newcomers.
 
 ## Pull requests
 

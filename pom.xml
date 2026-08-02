@@ -10,7 +10,7 @@
   <packaging>pom</packaging>
 
   <name>Reeforce</name>
-  <description>Open-source intraday WFM control plane for contact centers</description>
+  <description>Open-source intraday capacity control plane for contact centers, schools, and corridor ops</description>
   <url>https://github.com/vikas-prasad-cx/reeforce</url>
 
   <licenses>
