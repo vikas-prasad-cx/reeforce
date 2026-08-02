@@ -22,7 +22,7 @@ Same control surface across:
 
 Java 21 · Apache-2.0 · `mvn test` green
 
-Try the demos and open good-first issues if you want to help (chat concurrency, adherence-by-TOD, statsforecast adapter).
+Try the demos and open good-first issues if you want to help (chat concurrency, adherence-by-TOD, statsforecast + per-domain forecast adapters #9–#11).
 
 https://github.com/vikas-prasad-cx/reeforce
 
@@ -58,4 +58,4 @@ mvn -pl reeforce-cli exec:java \
   -Dexec.args="gap datasets/school-conference-cliff/demand.csv --domain school-conference --roster datasets/school-conference-cliff/roster.csv --meal-windows datasets/school-conference-cliff/slot-windows.csv"
 ```
 
-Good first issues: #2 #4 #7 → https://github.com/vikas-prasad-cx/reeforce
+Good first issues: #2 #4 #7 #9 #10 #11 → https://github.com/vikas-prasad-cx/reeforce
