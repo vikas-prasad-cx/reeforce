@@ -116,6 +116,9 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md). Good first issues (open for contributor
 - [#2 Model chat concurrency for required staff](https://github.com/vikas-prasad-cx/reeforce/issues/2)
 - [#4 Adherence-by-TOD estimator stub](https://github.com/vikas-prasad-cx/reeforce/issues/4)
 - [#7 Adapter stub: statsforecast → DemandSeries](https://github.com/vikas-prasad-cx/reeforce/issues/7)
+- [#9 Adapter stub: forecast → school-conference DemandSeries](https://github.com/vikas-prasad-cx/reeforce/issues/9)
+- [#10 Adapter stub: forecast → class-section DemandSeries](https://github.com/vikas-prasad-cx/reeforce/issues/10)
+- [#11 Adapter stub: forecast → traffic-corridor DemandSeries](https://github.com/vikas-prasad-cx/reeforce/issues/11)
 
 Operator playbook: [docs/rta-gap-board-playbook.md](docs/rta-gap-board-playbook.md). Changelog: [CHANGELOG.md](CHANGELOG.md).
 

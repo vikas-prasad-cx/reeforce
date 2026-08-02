@@ -1,6 +1,6 @@
 # Contributing to Reeforce
 
-Thanks for helping build an open intraday WFM control plane.
+Thanks for helping build an open intraday capacity control plane.
 
 ## Ground rules
 

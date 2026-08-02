@@ -13,6 +13,7 @@ All notable changes to Reeforce are documented here.
 - Domain deltas: `MOVE_SLOT`, `OPEN_SECTION`, `RETIME_DEMAND` (+ `REASSIGN_ROOM` enum)
 - Demo fixtures: `school-conference-cliff`, `class-section-overfill`, `traffic-corridor-peak`
 - Use-case docs under `docs/use-cases/`
+- Good first issues: per-domain forecast → DemandSeries adapters (#9 school, #10 class, #11 traffic)
 
 ### Changed
 
