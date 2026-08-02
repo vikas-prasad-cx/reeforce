@@ -1,0 +1,41 @@
+name: Bug report
+description: Something is wrong with gap board, deltas, CSV loaders, or CI
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. Prefer a minimal CSV fixture or `mvn test` failure if you can.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong in one or two sentences?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Commands, dataset paths, and expected vs actual output.
+      placeholder: |
+        mvn -pl reeforce-cli exec:java \
+          -Dexec.mainClass=ai.reeforce.cli.ReeforceCli \
+          -Dexec.args="gap datasets/..."
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      description: Tag (e.g. v0.1.0) or short SHA.
+    validations:
+      required: false
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, JDK, Maven versions (`java -version`, `mvn -version`).
+    validations:
+      required: false
