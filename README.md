@@ -68,7 +68,7 @@ mvn -pl reeforce-cli exec:java \
 
 How to read `UNDER` / `OVER` / `peak_gap`: [docs/rta-gap-board-playbook.md](docs/rta-gap-board-playbook.md).
 
-Use cases: [school conference](docs/use-cases/school-conference.md) · [class section](docs/use-cases/class-section.md) · [traffic corridor](docs/use-cases/traffic-corridor.md).
+Use cases: [school conference](docs/use-cases/school-conference.md) · [class section](docs/use-cases/class-section.md) · [traffic corridor](docs/use-cases/traffic-corridor.md) · [class section adapter](docs/adapters/class-section-forecast.md).
 
 Dataset schemas: [datasets/README.md](datasets/README.md). Staffing notes: [docs/erlang-a.md](docs/erlang-a.md).
 
