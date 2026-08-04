@@ -26,3 +26,7 @@ mvn -pl reeforce-cli exec:java \
 - Full student sectioning / course timetabling → UniTime / FET
 - Forecast of enrollment pressure → skforecast / NeuralForecast
 - Reeforce → live seat gap + open-overflow delta during registration
+
+## Related guides
+
+- [Class-Section Forecast Adapter Guide](../adapters/class-section-forecast.md) - Map registration forecasts to class-section DemandSeries.
