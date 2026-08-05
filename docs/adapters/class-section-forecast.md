@@ -58,7 +58,7 @@ SEC-OVERFLOW,2026-08-18T15:00:00Z,2026-08-18T15:30:00Z,AVAILABLE,25
 
 To test and verify the demand series against a target class-section roster:
 
-1. Place your generated `demand.csv` alongside `roster.csv` inside your dataset directory    
+1. Place your generated `demand.csv` alongside `roster.csv` inside your dataset directory
 (e.g., `datasets/class-section-overfill/`).
 2. Run the Reeforce capacity evaluation for `--domain class-section`:
 
@@ -66,4 +66,4 @@ To test and verify the demand series against a target class-section roster:
 mvn -pl reeforce-cli exec:java \
   -Dexec.mainClass=ai.reeforce.cli.ReeforceCli \
   -Dexec.args="gap datasets/class-section-overfill/demand.csv --domain class-section --roster datasets/class-section-overfill/roster.csv"
-  
+
